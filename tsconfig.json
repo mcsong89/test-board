@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es2016", // 컴파일된 자바스크립트의 대상 버전
+    "module": "commonjs", // 모듈 시스템 설정
+    "outDir": "./dist", // 컴파일된 파일이 저장될 디렉토리
+    "rootDir": "./src", // 소스 파일의 루트 디렉토리
+    "esModuleInterop": true, // CommonJS 모듈과의 호환성 설정
+    "forceConsistentCasingInFileNames": true, // 파일명 대소문자 일관성 검증
+    "strict": true, // 엄격한 타입 체크 옵션 활성화
+    "skipLibCheck": true // 라이브러리 파일의 타입 체크 생략
+  }
+}
