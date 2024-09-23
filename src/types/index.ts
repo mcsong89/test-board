@@ -1,4 +1,15 @@
 // src/types/index.ts
+
+export interface Post {
+  id: number;
+  title: string;
+  content: string;
+  authorName: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface PostInput {
   title: string;
   content: string; // HTML 문자열
@@ -13,17 +24,26 @@ export interface PostQuery {
   author?: string;
 }
 
-export interface CommentInput {
+export interface Comment {
   id: number;
   content: string; // HTML 문자열
   authorName: string;
   password: string | null;
-  createdAt: Date;
   postId: number;
   parentId: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  replies?: CommentWithReplies[];
 }
 
-export interface CommentWithReplies extends CommentInput {
+export interface CommentInput {
+  content: string; // HTML 문자열
+  authorName: string;
+  password?: string | null;
+  parentId?: number | null; // 대댓글인 경우 부모 댓글 ID
+}
+
+export interface CommentWithReplies extends Comment {
   replies: CommentWithReplies[];
 }
 

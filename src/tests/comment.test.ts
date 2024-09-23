@@ -1,4 +1,5 @@
 // src/tests/comment.test.ts
+
 jest.mock('../services/alertService', () => ({
   sendKeywordAlerts: jest.fn(),
 }));
@@ -8,7 +9,7 @@ import request from 'supertest';
 import app from '../app';
 import prisma from '../prisma';
 import { MockPrismaClient } from '../__mocks__/prisma';
-import { CommentWithReplies } from '../types';
+import { Comment } from '../types';
 import * as alertService from '../services/alertService';
 
 describe('Comment API', () => {
@@ -20,13 +21,14 @@ describe('Comment API', () => {
   });
 
   it('댓글 목록 조회', async () => {
-    const mockComments: CommentWithReplies[] = [
+    const mockComments: Comment[] = [
       {
         id: 1,
         content: '댓글 내용',
         authorName: '댓글 작성자',
         password: null,
         createdAt: new Date(),
+        updatedAt: new Date(),
         postId: 1,
         parentId: null,
         replies: [
@@ -36,6 +38,7 @@ describe('Comment API', () => {
             authorName: '대댓글 작성자',
             password: null,
             createdAt: new Date(),
+            updatedAt: new Date(),
             postId: 1,
             parentId: 1,
             replies: [], // 대댓글의 대댓글
@@ -59,26 +62,71 @@ describe('Comment API', () => {
     });
   });
 
-  it('댓글 작성', async () => {
+  it('댓글 작성 - 성공', async () => {
+    // 댓글 생성 결과 모킹
     mockPrisma.comment.create.mockResolvedValue({
       id: 1,
-      content: '새 댓글',
+      content: '첫 번째 댓글',
       authorName: '댓글 작성자',
-      password: null,
-      createdAt: new Date(),
+      password: 'password123',
       postId: 1,
       parentId: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     const response = await request(app).post('/comments/1').send({
-      content: '새 댓글',
+      content: '첫 번째 댓글',
       authorName: '댓글 작성자',
       password: 'password123',
     });
-    console.log(response.body);
 
     expect(response.status).toBe(200);
-    expect(response.body.content).toBe('새 댓글');
+    expect(response.body.content).toBe('첫 번째 댓글');
+    expect(mockPrisma.comment.create).toHaveBeenCalledTimes(1);
+    expect(mockPrisma.comment.create).toHaveBeenCalledWith({
+      data: {
+        content: '첫 번째 댓글',
+        authorName: '댓글 작성자',
+        password: 'password123',
+        postId: 1,
+        parentId: null,
+      },
+    });
+    expect(alertService.sendKeywordAlerts).toHaveBeenCalledTimes(1);
+  });
+
+  it('대댓글 작성 - 성공', async () => {
+    // 대댓글 생성 결과 모킹
+    mockPrisma.comment.create.mockResolvedValue({
+      id: 2,
+      content: '첫 번째 대댓글',
+      authorName: '대댓글 작성자',
+      password: 'password123',
+      postId: 1,
+      parentId: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const response = await request(app).post('/comments/1').send({
+      content: '첫 번째 대댓글',
+      authorName: '대댓글 작성자',
+      password: 'password123',
+      parentId: 1,
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.content).toBe('첫 번째 대댓글');
+    expect(mockPrisma.comment.create).toHaveBeenCalledWith({
+      data: {
+        content: '첫 번째 대댓글',
+        authorName: '대댓글 작성자',
+        password: 'password123',
+        postId: 1,
+        parentId: 1,
+      },
+    });
     expect(mockPrisma.comment.create).toHaveBeenCalledTimes(1);
     expect(alertService.sendKeywordAlerts).toHaveBeenCalledTimes(1);
   });

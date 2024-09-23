@@ -1,7 +1,7 @@
 // src/services/postService.ts
 
 import prisma from '../prisma';
-import { PostInput, PostQuery } from '../types';
+import { Post, PostQuery } from '../types';
 import { sendKeywordAlerts } from './alertService';
 import sanitizeHtml from 'sanitize-html';
 import { HttpError } from '../errors/HttpError';
@@ -33,7 +33,7 @@ export const getPostsService = async (query: PostQuery) => {
   }
 };
 
-export const createPostService = async (data: PostInput) => {
+export const createPostService = async (data: Post) => {
   // 비밀번호 입력 필수 조건 추가
   if (!data.password) {
     throw new HttpError(400, '비밀번호는 필수 입력 사항입니다.');
@@ -65,7 +65,7 @@ export const createPostService = async (data: PostInput) => {
   }
 };
 
-export const updatePostService = async (id: string, data: PostInput) => {
+export const updatePostService = async (id: string, data: Post) => {
   try {
     const post = await prisma.post.findUnique({
       where: { id: Number(id) },

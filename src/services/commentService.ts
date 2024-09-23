@@ -1,7 +1,7 @@
 // src/services/commentService.ts
 
 import prisma from '../prisma';
-import { CommentInput, CommentQuery } from '../types';
+import { Comment, CommentQuery } from '../types';
 import { sendKeywordAlerts } from './alertService';
 import sanitizeHtml from 'sanitize-html';
 import { HttpError } from '../errors/HttpError';
@@ -29,10 +29,7 @@ export const getCommentsService = async (
   }
 };
 
-export const createCommentService = async (
-  postId: string,
-  data: CommentInput
-) => {
+export const createCommentService = async (postId: string, data: Comment) => {
   const sanitizedContent = sanitizeHtml(data.content, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
     allowedAttributes: {
@@ -64,7 +61,7 @@ export const createCommentService = async (
 
 export const updateCommentService = async (
   commentId: string,
-  data: CommentInput
+  data: Comment
 ) => {
   try {
     const comment = await prisma.comment.findUnique({

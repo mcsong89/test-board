@@ -30,6 +30,7 @@ model Comment {
   authorName  String
   password    String?    
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   post        Post      @relation("PostComments", fields: [postId], references: [id])
   postId      Int
   parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
